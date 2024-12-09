@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wine Quality Tester</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eaeaea;
+            margin: 0;
+            padding: 20px;
+            display: grid;
+            place-items: center;
+            height: 100vh;
+            color: #4a4a4a;
+        }
+
+        h1 {
+            color: #5d1049;
+            text-align: center;
+        }
+
+        #uploadForm {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: grid;
+            gap: 10px;
+            justify-items: center;
+        }
+
+        #fileInput {
+            border: 2px solid #5d1049;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        input[type="submit"] {
+            background-color: #5d1049;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #812f76;
+        }
+
+        #result {
+            display: none;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+            border-radius: 4px;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Wine Quality Tester</h1>
+    <form id="uploadForm" action="http://ec2-3-81-189-24.compute-1.amazonaws.com:5000/predict" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" id="fileInput">
+        <input type="submit" value="Predict Quality">
+    </form>
+    <p id="result"></p>
+
+    <script>
+        document.getElementById("uploadForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const fileInput = document.getElementById("fileInput");
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append("file", file);
+
+            fetch("http://ec2-3-81-189-24.compute-1.amazonaws.com:5000/predict", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultElement = document.getElementById("result");
+                resultElement.innerHTML = "Predicted F1 Score: " + data.f1_score;
+                resultElement.style.display = "block";
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    </script>
+</body>
+
+</html>
